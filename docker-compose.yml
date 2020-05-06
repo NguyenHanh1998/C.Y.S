@@ -1,0 +1,48 @@
+version: "3"
+services:
+  # setup node container
+  server:
+    build: ./backend
+    expose:
+      - "8000"
+    environment:
+      APP_SERVER_PORT: "8000"
+    depends_on:
+      - redis
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend/app:/app/cys-admin-server/app
+    command: npm start
+
+  # setup client container
+  client:
+    build: ./frontend
+    expose:
+      - "3000"
+    environment:
+      REACT_APP_PORT: "3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/cys-admin-client/src
+    command: npm start
+
+  mysql:
+    image: mysql
+    ports:
+      - "6603:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: "crate"
+      MYSQL_USER: "crate"
+      MYSQL_PASSWORD: "crate123"
+    volumes:
+      - ./mysqldata:/var/lib/mysql
+
+  redis:
+    image: redis
+    environment:
+      - REDIS_URL=redis://redis:6379
+    expose:
+      - "6379"
